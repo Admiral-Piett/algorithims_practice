@@ -17,12 +17,19 @@ class BreadthFirstSearch():
         self.explored_verticies = set()
         self.distance = dict()
         self.queue = []
+        self.start = start
+        self.end = end
 
     def run_me(self):
         self.queue.append(self.pick_start_vertex())
+
         print('START', self.queue[0], '\n')
         self.search()
-        return self.distance
+
+        if self.end is not False:
+            return {self.end: self.distance[self.end]}
+        else:
+            return self.distance
 
     def search(self):
 
@@ -47,20 +54,26 @@ class BreadthFirstSearch():
 
 
     def pick_start_vertex(self):
-        vert = random.randint(1, len(graph))
-        self.distance[vert] = 0
-        self.explored_verticies.add(vert)
-        return vert
+        if self.start is not False:
+            self.queue.append(self.start)
+            self.distance[self.start] = 0
+            self.explored_verticies.add(self.start)
+            return self.start
+        else:
+            vert = random.randint(1, len(graph))
+            self.distance[vert] = 0
+            self.explored_verticies.add(vert)
+            return vert
 
 if __name__ == '__main__':
     g = GenerateGraphDict(1000, 5)
     graph = g.generate_graph()
 
-    # for k, v in graph.items():
-    #     print('key', k, 'value', v)
-    # print('\n\n')
+    for k, v in graph.items():
+        print('key', k, 'value', v)
+    print('\n\n')
 
-    bSearch = BreadthFirstSearch(graph)
+    bSearch = BreadthFirstSearch(graph, start=1, end=650)
     distances = bSearch.run_me()
     print('DISTANCES')
     for k, v, in distances.items():
