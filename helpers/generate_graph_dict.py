@@ -1,3 +1,6 @@
+# NOTE: This is a directional graph
+# Need more logic for a unidirectional graph - need to copy edges into both graphs
+
 import random
 
 class GenerateGraphDict():
