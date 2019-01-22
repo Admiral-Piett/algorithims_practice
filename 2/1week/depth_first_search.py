@@ -48,6 +48,19 @@ class DepthFirstSearch():
         return self.distance
 
 
+class DepthFirstSearchWholistic(DepthFirstSearch):
+
+    def run_me_wholistic(self):
+        self.run_me()
+
+        for i in range(1, len(self.graph) + 1):
+            if i not in self.explored:
+                self.search(self.graph, i, 0)
+
+        return self.distance
+
+
+
 
 if __name__ == '__main__':
     g = GenerateGraphDict(10, 5)
@@ -59,3 +72,6 @@ if __name__ == '__main__':
 
     dfs = DepthFirstSearch(graph)
     print(dfs.run_me())
+
+    dfsw = DepthFirstSearchWholistic(graph)
+    print(dfsw.run_me_wholistic())
