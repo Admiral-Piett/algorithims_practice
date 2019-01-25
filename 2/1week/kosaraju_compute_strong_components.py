@@ -7,19 +7,18 @@ import random
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../..')))
 from helpers.generate_graph_dict import GenerateGraphDict
 
-# Tweaked DFS
 
 class DepthFirstSearch():
 
-    def __init__(self, graph, start=False, reverse=False):
+    def __init__(self, graph, start=False):
         self.graph = graph
         self.start = self.handle_start(start)
-        self.reverse = reverse
         # print('start', self.start, '\n')
         self.explored = list()
+        # This is more how many steps it took to get there rather than the actual distance from the start
+        # self.distance = dict()
+        self.rank = 0
         self.finishing_times = dict()
-        # self.finishing_times = []
-        self.count = 1
 
 
     def handle_start(self, start):
@@ -32,42 +31,46 @@ class DepthFirstSearch():
         # self.explored.add(vert)
         self.explored.append(vert)
         for i in graph[vert]:
-            print('exploring', i)
             # print('Checking - {0}'.format(i))
             if i not in self.explored:
                 # print(list(self.explored))
-                # distance += 1
                 self.search(graph, i)
+                self.rank += 1
+                self.finishing_times[self.rank] = i
+        #     else:
+        #         print('ALREADY EXPLORED - {0}'.format(i))
+        # if int(vert) not in self.finishing_times.values():
+        #     self.rank += 1
+        #     self.finishing_times[self.rank] = int(vert)
 
-                print('returning to', i)
-                print(list(self.finishing_times.values()))
-                print(self.finishing_times)
-
-                if i not in list(self.finishing_times.values()):
-                    print('adding to the list', i)
-                    # THIS IS CLOSE BUT I AM MISSING 9
-                    self.finishing_times[self.count] = i
-                    self.count += 1
-            else:
-                print('ALREADY EXPLORED - {0}'.format(i))
-                print('returning - ', vert)
-                if i not in list(self.finishing_times.values()):
-                    self.finishing_times[self.count] = vert
-                    self.count += 1
-                    return
-
-    def run_me(self, reverse=False):
-        if reverse == False:
-            for i in range(1, len(self.graph) + 1):
-                self.search(self.graph, i)
+    def run_me(self, mode):
+        if mode == 'loop':
+            self.loop_mode(True)
         else:
-            for i in range(len(self.graph), 0, -1):
-                self.search(self.graph, i)
+            self.normal_mode()
 
         return self.finishing_times
 
+    def normal_mode(self):
+        self.search(self.graph, self.start)
+        return self.finishing_times
 
+    def loop_mode(self, reverse=False):
+        if reverse is True:
+            for i in range(len(self.graph), 0, -1):
+                print('running dfs on - ', i)
+                if i not in self.explored:
+                    self.search(self.graph, i)
+                
+                if int(i) not in self.finishing_times.values():
+                    self.rank += 1
+                    self.finishing_times[self.rank] = i
 
+        else:
+            for i in range(1, len(self.graph)):
+                print('running dfs on - ', i)
+                if i not in self.explored:
+                    self.search(self.graph, i)
 
 # 1. Reverse edges on the graph
 #     1. Either create a new graph going in the opposite direction
@@ -119,7 +122,7 @@ class StronglyConnectedComponents():
         # for i in range(len(self.reversed_graph), 0, -1):
         #     print('running dfs on - ', i)
         dfs = DepthFirstSearch(self.reversed_graph, i)
-        result = dfs.run_me(True)
+        result = dfs.run_me('loop')
         print(result)
         # print(len(result))
         # exit()
