@@ -28,14 +28,8 @@ class DepthFirstSearch():
         self.reverse_graph = reverse_graph
         self.orig_graph = orig_graph
         self.start = self.handle_start(start)
-        # print('start', self.start, '\n')
         self.explored = list()
-        # This is more how many steps it took to get there rather than the actual distance from the start
-        # self.distance = dict()
-        
-        # NOTE: Swap comments to make dictionary VS list
-        self.rank = 0
-        # self.finishing_times = dict()
+
         self.finishing_times = list()
 
         self.component_check = list()
@@ -49,18 +43,12 @@ class DepthFirstSearch():
             return start
 
     def search(self, graph, vert):
-        # self.explored.add(vert)
         self.explored.append(vert)
         for i in graph[vert]:
-            # print('Checking - {0}'.format(i))
             if i not in self.explored:
-                # print(list(self.explored))
                 self.search(graph, i)
-                # self.rank += 1
-                # self.finishing_times[self.rank] = i
                 self.finishing_times.append(i)
-        #     else:
-        #         print('ALREADY EXPLORED - {0}'.format(i))
+
 
     
     def search_for_components(self, graph, vert):
@@ -97,8 +85,6 @@ class DepthFirstSearch():
                     self.search(self.reverse_graph, i)
                 
                 if int(i) not in self.finishing_times:
-                    # self.rank += 1
-                    # self.finishing_times[self.rank] = i
                     self.finishing_times.append(i)
 
         else:
@@ -110,15 +96,12 @@ class DepthFirstSearch():
                     self.component_check.append(i)
                     self.search_for_components(self.orig_graph, i)
 
-                    self.rank += 1
-                    self.strong_components[self.rank] = self.component_check
+                    self.strong_components[self.component_check[0]] = self.component_check
                     self.component_check = list()
 
 
 
-# dic = dict()
-# for i in range(10, 1, -1):
-#     dic[i] = []
+
 
 class StronglyConnectedComponents():
 
@@ -145,16 +128,12 @@ class StronglyConnectedComponents():
         return reversed_graph
 
     def run_me(self):
-        # return self.reverse_graph(self.graph)
         self.reversed_graph = self.reverse_graph(self.graph)
         
-        # for i in range(len(self.reversed_graph), 0, -1):
-        #     print('running dfs on - ', i)
         reverse_dfs = DepthFirstSearch(self.reversed_graph, self.graph)
         result = reverse_dfs.run_me()
         print(result)
-        # print(len(result))
-        # exit()
+
 
 
 # JSON Printing of the Strongly Connected Components SCC
