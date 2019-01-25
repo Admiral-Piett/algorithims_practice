@@ -1,77 +1,3 @@
-import sys
-import os
-import random
-
-# from depth_first_search import DepthFirstSearch
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../..')))
-from helpers.generate_graph_dict import GenerateGraphDict
-
-
-class DepthFirstSearch():
-
-    def __init__(self, graph, start=False):
-        self.graph = graph
-        self.start = self.handle_start(start)
-        # print('start', self.start, '\n')
-        self.explored = list()
-        # This is more how many steps it took to get there rather than the actual distance from the start
-        # self.distance = dict()
-        self.rank = 0
-        self.finishing_times = dict()
-
-
-    def handle_start(self, start):
-        if start is False:
-            return random.randint(1, len(self.graph))
-        else:
-            return start
-
-    def search(self, graph, vert):
-        # self.explored.add(vert)
-        self.explored.append(vert)
-        for i in graph[vert]:
-            # print('Checking - {0}'.format(i))
-            if i not in self.explored:
-                # print(list(self.explored))
-                self.search(graph, i)
-                self.rank += 1
-                self.finishing_times[self.rank] = i
-        #     else:
-        #         print('ALREADY EXPLORED - {0}'.format(i))
-        # if int(vert) not in self.finishing_times.values():
-        #     self.rank += 1
-        #     self.finishing_times[self.rank] = int(vert)
-
-    def run_me(self, mode):
-        if mode == 'loop':
-            self.loop_mode(True)
-        else:
-            self.normal_mode()
-
-        return self.finishing_times
-
-    def normal_mode(self):
-        self.search(self.graph, self.start)
-        return self.finishing_times
-
-    def loop_mode(self, reverse=False):
-        if reverse is True:
-            for i in range(len(self.graph), 0, -1):
-                print('running dfs on - ', i)
-                if i not in self.explored:
-                    self.search(self.graph, i)
-                
-                if int(i) not in self.finishing_times.values():
-                    self.rank += 1
-                    self.finishing_times[self.rank] = i
-
-        else:
-            for i in range(1, len(self.graph)):
-                print('running dfs on - ', i)
-                if i not in self.explored:
-                    self.search(self.graph, i)
-
 # 1. Reverse edges on the graph
 #     1. Either create a new graph going in the opposite direction
 #     2. OR traverse the graphs backward
@@ -86,10 +12,113 @@ class DepthFirstSearch():
     # Label nodes in the second pass with a leader node.
         # Strongly Connected Components will have same leader - AKA leader = starting node, all who form a continuous chain from the same starting node are strongly conencted
 
-dic = dict()
-for i in range(10, 1, -1):
-    dic[i] = []
-print(dic)
+import sys
+import os
+import random
+
+# from depth_first_search import DepthFirstSearch
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../..')))
+from helpers.generate_graph_dict import GenerateGraphDict
+
+
+class DepthFirstSearch():
+
+    def __init__(self, reverse_graph, orig_graph, start=False):
+        self.reverse_graph = reverse_graph
+        self.orig_graph = orig_graph
+        self.start = self.handle_start(start)
+        # print('start', self.start, '\n')
+        self.explored = list()
+        # This is more how many steps it took to get there rather than the actual distance from the start
+        # self.distance = dict()
+        
+        # NOTE: Swap comments to make dictionary VS list
+        self.rank = 0
+        # self.finishing_times = dict()
+        self.finishing_times = list()
+
+        self.component_check = list()
+        self.strong_components = dict()
+
+
+    def handle_start(self, start):
+        if start is False:
+            return random.randint(1, len(self.orig_graph))
+        else:
+            return start
+
+    def search(self, graph, vert):
+        # self.explored.add(vert)
+        self.explored.append(vert)
+        for i in graph[vert]:
+            # print('Checking - {0}'.format(i))
+            if i not in self.explored:
+                # print(list(self.explored))
+                self.search(graph, i)
+                # self.rank += 1
+                # self.finishing_times[self.rank] = i
+                self.finishing_times.append(i)
+        #     else:
+        #         print('ALREADY EXPLORED - {0}'.format(i))
+
+    
+    def search_for_components(self, graph, vert):
+        self.explored.append(vert)
+        for i in graph[vert]:
+            if i not in self.explored:
+                self.search_for_components(graph, i)
+                self.component_check.append(i)
+            break
+
+
+    def run_me(self):
+        self.loop_mode(True)
+        print(self.finishing_times)
+
+        self.explored = list()
+        self.loop_mode(False, self.finishing_times)
+
+        return self.strong_components
+
+
+
+    def normal_mode(self, graph):
+        self.search(graph, self.start)
+        return self.finishing_times
+
+    def loop_mode(self, reverse=False, iter_range=False):
+        if reverse is True:
+            if iter_range is False:
+                iter_range = range(len(self.reverse_graph), 0, -1)
+            for i in iter_range:
+                print('running dfs on - ', i)
+                if i not in self.explored:
+                    self.search(self.reverse_graph, i)
+                
+                if int(i) not in self.finishing_times:
+                    # self.rank += 1
+                    # self.finishing_times[self.rank] = i
+                    self.finishing_times.append(i)
+
+        else:
+            if iter_range is False:
+                iter_range = range(1, len(self.orig_graph))
+            for i in iter_range:
+                print('running dfs on - ', i)
+                if i not in self.explored:
+                    self.component_check.append(i)
+                    self.search_for_components(self.orig_graph, i)
+
+                    self.rank += 1
+                    self.strong_components[self.rank] = self.component_check
+                    self.component_check = list()
+
+
+
+# dic = dict()
+# for i in range(10, 1, -1):
+#     dic[i] = []
 
 class StronglyConnectedComponents():
 
@@ -121,8 +150,8 @@ class StronglyConnectedComponents():
         
         # for i in range(len(self.reversed_graph), 0, -1):
         #     print('running dfs on - ', i)
-        dfs = DepthFirstSearch(self.reversed_graph, i)
-        result = dfs.run_me('loop')
+        reverse_dfs = DepthFirstSearch(self.reversed_graph, self.graph)
+        result = reverse_dfs.run_me()
         print(result)
         # print(len(result))
         # exit()
