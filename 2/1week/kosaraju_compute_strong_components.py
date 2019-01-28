@@ -154,17 +154,17 @@ if __name__ == '__main__':
     #     9: [6]
     # }
 
-    # graph = {
-    #     1: [4],
-    #     2: [8],
-    #     3: [6],
-    #     4: [7],
-    #     5: [2],
-    #     6: [9],
-    #     7: [1],
-    #     8: [5, 6],
-    #     9: [3, 7]
-    # }
+    graph = {
+        1: [4],
+        2: [8],
+        3: [6],
+        4: [7],
+        5: [2],
+        6: [9],
+        7: [1],
+        8: [5, 6],
+        9: [3, 7]
+    }
 
     print('Original Graph')
     for k, v in graph.items():
@@ -179,9 +179,6 @@ if __name__ == '__main__':
     # for k, v in strongly_connected_components.items():
     #     print('key', k, 'value', v)
     # print('\n\n')
-
-    g = Graph(r_graph)
-    g.printSCCs()
     
 
 
